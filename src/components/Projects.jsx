@@ -2,6 +2,17 @@ import { useEffect, useRef, useState } from 'react'
 
 const projects = [
   {
+    name: 'Lumina Studio',
+    tagline: 'System zarządzania dla fotografa',
+    desc: 'Kompleksowa platforma dla fotografa — publiczne portfolio i prywatny system dla klientów. Klient po sesji dostaje unikalny kod dostępu do galerii i sam wybiera zdjęcia do retuszu. Fotograf zarządza wszystkim z panelu admina.',
+    features: ['System autoryzacji przez kod sesji', 'Auto-kompresja zdjęć (10MB → 400KB)', 'Panel admina z rezerwacjami', 'Editorial grid layout + animacje'],
+    tech: ['React', 'Vite', 'Supabase', 'Framer Motion', 'Tailwind CSS', 'Canvas API'],
+    github: 'https://github.com/szymon-222/lumina',
+    live: null,
+    color: '#f472b6',
+    icon: '📸',
+  },
+  {
     name: 'PolChat',
     tagline: 'Fullstack real-time chat application',
     desc: 'Kompletna platforma do czatu w czasie rzeczywistym z pokojami, czatem 1:1, reakcjami emoji, wysyłaniem plików i panelem admina. Wiadomości bez opóźnień dzięki Socket.io.',
@@ -9,32 +20,51 @@ const projects = [
     tech: ['React', 'Node.js', 'Socket.io', 'Supabase', 'PostgreSQL', 'Express'],
     github: 'https://github.com/szymon-222/polchat',
     live: null,
-    featured: true,
     color: '#667eea',
     icon: '💬',
   },
   {
+    name: 'DevHUB',
+    tagline: 'System dowodzenia developera — PWA',
+    desc: 'Autorski system zarządzania działalnością freelancerską i finansami osobistymi. Instalowalna aplikacja PWA z dashboardem finansowym, CRM, generatorem rachunków PDF zgodnym z polskim prawem i bazą klientów.',
+    features: ['Generator PDF z polskimi znakami', 'CRM — od leada do wdrożenia', 'Kalkulator zarobków (0% PIT <26 lat)', 'Offline-first PWA + Service Worker'],
+    tech: ['React', 'Vite', 'Supabase', 'Tailwind CSS', 'jsPDF', 'PWA'],
+    github: null,
+    live: null,
+    color: '#34d399',
+    icon: '⚡',
+  },
+  {
+    name: 'AutoDiag',
+    tagline: 'Webowa diagnostyka usterek samochodowych',
+    desc: 'Aplikacja webowa do diagnostyki samochodowej. Użytkownik wybiera model auta i objawy — własny algorytm wagowy zwraca ranking najbardziej prawdopodobnych usterek z kosztami, trudnością naprawy i listą części.',
+    features: ['Własny silnik diagnostyczny (weighted scoring)', '75 usterek, 37 objawów w bazie', 'TypeScript end-to-end', 'Dark industrial design system'],
+    tech: ['Next.js 14', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'PostgreSQL', 'Supabase'],
+    github: null,
+    live: null,
+    color: '#f59e0b',
+    icon: '🔧',
+  },
+  {
     name: 'OLX Monitor Pro',
     tagline: 'Inteligentny monitoring ogłoszeń',
-    desc: 'System monitorowania rynku nieruchomości 24/7. Bot automatycznie przegląda OLX, analizuje oferty i wysyła eleganckie powiadomienia na Discorda ze zdjęciem i parametrami — zanim dobra oferta zniknie.',
+    desc: 'System monitorowania rynku nieruchomości 24/7. Bot automatycznie przegląda OLX, analizuje oferty i wysyła powiadomienia na Discorda ze zdjęciem i parametrami — zanim dobra oferta zniknie.',
     features: ['Monitoring 24/7 (Selenium)', 'Powiadomienia Discord', 'Dashboard analityczny (Flask)', 'Wykresy ceny/metrażu'],
     tech: ['Python', 'Selenium', 'Flask', 'SQLite', 'Pandas', 'Discord API'],
     github: 'https://github.com/szymon-222',
     live: null,
-    featured: true,
     color: '#a78bfa',
     icon: '🔍',
   },
   {
     name: 'Personal Trainer App',
     tagline: 'Elite Performance Coach Platform',
-    desc: 'Ekskluzywna platforma dashboard/landing dla trenera personalnego. Zawiera kalkulator makroskładników (BMR/TDEE), zarządzanie klientami z CRUD, wykresy postępów i animowany particle system.',
+    desc: 'Ekskluzywna platforma dashboard dla trenera personalnego z kalkulatorem makroskładników BMR/TDEE, zarządzaniem klientami CRUD, wykresami postępów i animowanym particle systemem na Canvas.',
     features: ['Kalkulator BMR/TDEE', 'CRUD klientów (LocalStorage)', 'Wykresy Chart.js', 'Particle system na Canvas'],
     tech: ['HTML5', 'JavaScript', 'CSS3', 'Chart.js', 'Canvas API'],
     github: 'https://github.com/szymon-222',
     live: null,
-    featured: false,
-    color: '#34d399',
+    color: '#06b6d4',
     icon: '💪',
   },
   {
@@ -45,11 +75,12 @@ const projects = [
     tech: ['HTML5', 'CSS3', 'JavaScript'],
     github: 'https://github.com/szymon-222',
     live: null,
-    featured: false,
-    color: '#f59e0b',
+    color: '#fb923c',
     icon: '🚗',
   },
 ]
+
+const VISIBLE_DEFAULT = 4
 
 function useInView(threshold = 0.1) {
   const ref = useRef(null)
@@ -65,11 +96,9 @@ function useInView(threshold = 0.1) {
   return [ref, inView]
 }
 
-function ProjectCard({ project, index }) {
+function ProjectCard({ project, index, visible }) {
   const [ref, inView] = useInView()
   const [hovered, setHovered] = useState(false)
-
-  const isFeatured = project.featured
 
   return (
     <div
@@ -80,46 +109,30 @@ function ProjectCard({ project, index }) {
         background: 'var(--surface)',
         border: `1px solid ${hovered ? project.color + '55' : 'var(--border)'}`,
         borderRadius: '16px',
-        padding: isFeatured ? '36px' : '28px',
+        padding: '32px',
         position: 'relative',
         overflow: 'hidden',
         cursor: 'default',
-        opacity: inView ? 1 : 0,
-        transform: inView ? 'translateY(0)' : 'translateY(40px)',
-        transition: `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s, border-color 0.3s, box-shadow 0.3s`,
-        boxShadow: hovered ? `0 12px 48px ${project.color}1a` : 'none',
         display: 'flex',
         flexDirection: 'column',
-        gap: '0',
+
+        // Animacja wjazdu przy inView
+        opacity: inView && visible ? 1 : 0,
+        transform: inView && visible ? 'translateY(0)' : 'translateY(32px)',
+        transition: `opacity 0.55s ease ${index * 0.07}s, transform 0.55s ease ${index * 0.07}s, border-color 0.3s, box-shadow 0.3s`,
+        boxShadow: hovered ? `0 12px 48px ${project.color}1a` : 'none',
+
+        // Ukrycie gdy collapsed
+        maxHeight: visible ? '1000px' : '0',
+        pointerEvents: visible ? 'all' : 'none',
       }}
     >
-      {/* Top glow bar */}
+      {/* Top glow */}
       <div style={{
-        position: 'absolute',
-        top: 0, left: 0, right: 0,
-        height: '2px',
+        position: 'absolute', top: 0, left: 0, right: 0, height: '2px',
         background: `linear-gradient(90deg, transparent, ${project.color}, transparent)`,
-        opacity: hovered ? 1 : 0,
-        transition: 'opacity 0.3s',
+        opacity: hovered ? 1 : 0, transition: 'opacity 0.3s',
       }} />
-
-      {/* Featured badge */}
-      {isFeatured && (
-        <div style={{
-          position: 'absolute',
-          top: '20px', right: '20px',
-          fontSize: '0.6rem',
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          color: project.color,
-          background: project.color + '15',
-          border: `1px solid ${project.color}35`,
-          padding: '3px 10px',
-          borderRadius: '20px',
-        }}>
-          Featured
-        </div>
-      )}
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
@@ -129,8 +142,7 @@ function ProjectCard({ project, index }) {
           border: `1px solid ${project.color}35`,
           borderRadius: '12px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '1.4rem',
-          flexShrink: 0,
+          fontSize: '1.4rem', flexShrink: 0,
           transition: 'transform 0.2s',
           transform: hovered ? 'scale(1.08)' : 'scale(1)',
         }}>
@@ -138,72 +150,47 @@ function ProjectCard({ project, index }) {
         </div>
         <div>
           <h3 style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: isFeatured ? '1.25rem' : '1.1rem',
-            fontWeight: 700,
-            color: 'var(--text)',
-            lineHeight: 1.2,
-            marginBottom: '3px',
+            fontFamily: 'var(--font-display)', fontSize: '1.15rem',
+            fontWeight: 700, color: 'var(--text)', lineHeight: 1.2, marginBottom: '3px',
           }}>
             {project.name}
           </h3>
-          <div style={{
-            fontSize: '0.7rem',
-            color: project.color,
-            letterSpacing: '0.06em',
-            opacity: 0.85,
-          }}>
+          <div style={{ fontSize: '0.7rem', color: project.color, letterSpacing: '0.06em', opacity: 0.85 }}>
             {project.tagline}
           </div>
         </div>
       </div>
 
       {/* Opis */}
-      <p style={{
-        fontSize: '0.85rem',
-        color: 'var(--text-muted)',
-        lineHeight: 1.8,
-        marginBottom: '20px',
-        flex: 1,
-      }}>
+      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.8, marginBottom: '20px', flex: 1 }}>
         {project.desc}
       </p>
 
-      {/* Feature lista */}
+      {/* Features */}
       <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '6px',
-        marginBottom: '24px',
-        padding: '16px',
+        display: 'flex', flexDirection: 'column', gap: '6px',
+        marginBottom: '24px', padding: '14px 16px',
         background: project.color + '08',
         borderRadius: '10px',
         border: `1px solid ${project.color}18`,
       }}>
         {project.features.map(f => (
-          <div key={f} style={{
-            display: 'flex', alignItems: 'center', gap: '8px',
-            fontSize: '0.78rem', color: 'var(--text-muted)',
-          }}>
-            <span style={{ color: project.color, fontSize: '0.6rem' }}>◆</span>
+          <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+            <span style={{ color: project.color, fontSize: '0.55rem', flexShrink: 0 }}>◆</span>
             {f}
           </div>
         ))}
       </div>
 
-      {/* Footer: tagi + link */}
+      {/* Footer */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '12px', flexWrap: 'wrap' }}>
-        {/* Tech tagi */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
           {project.tech.map(t => (
             <span key={t} style={{
-              fontSize: '0.65rem',
-              letterSpacing: '0.05em',
-              color: project.color,
-              background: project.color + '12',
+              fontSize: '0.65rem', letterSpacing: '0.05em',
+              color: project.color, background: project.color + '12',
               border: `1px solid ${project.color}28`,
-              padding: '3px 10px',
-              borderRadius: '20px',
+              padding: '3px 10px', borderRadius: '20px',
               fontFamily: 'var(--font-mono)',
             }}>
               {t}
@@ -211,27 +198,28 @@ function ProjectCard({ project, index }) {
           ))}
         </div>
 
-        {/* GitHub link */}
-        <a
-          href={project.github}
-          target="_blank"
-          rel="noreferrer"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontSize: '0.72rem',
-            color: hovered ? project.color : 'var(--text-muted)',
-            transition: 'color 0.2s',
-            letterSpacing: '0.04em',
-            flexShrink: 0,
-            fontFamily: 'var(--font-mono)',
-          }}
-          onMouseEnter={e => e.currentTarget.style.color = project.color}
-          onMouseLeave={e => e.currentTarget.style.color = hovered ? project.color : 'var(--text-muted)'}
-        >
-          GitHub →
-        </a>
+        {project.github ? (
+          <a href={project.github} target="_blank" rel="noreferrer"
+            style={{
+              fontSize: '0.72rem', color: hovered ? project.color : 'var(--text-muted)',
+              transition: 'color 0.2s', letterSpacing: '0.04em',
+              flexShrink: 0, fontFamily: 'var(--font-mono)',
+            }}
+            onMouseEnter={e => e.currentTarget.style.color = project.color}
+            onMouseLeave={e => e.currentTarget.style.color = hovered ? project.color : 'var(--text-muted)'}
+          >
+            GitHub →
+          </a>
+        ) : (
+          <span style={{
+            fontSize: '0.68rem', color: 'var(--text-dim)',
+            fontFamily: 'var(--font-mono)', letterSpacing: '0.04em',
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+          }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--text-dim)', display: 'inline-block' }} />
+            Prywatne repo
+          </span>
+        )}
       </div>
     </div>
   )
@@ -239,13 +227,30 @@ function ProjectCard({ project, index }) {
 
 export default function Projects() {
   const [ref, inView] = useInView()
+  const [expanded, setExpanded] = useState(false)
+  const extraRef = useRef(null)
 
-  const featured = projects.filter(p => p.featured)
-  const rest     = projects.filter(p => !p.featured)
+  const visible    = projects.slice(0, VISIBLE_DEFAULT)
+  const hidden     = projects.slice(VISIBLE_DEFAULT)
+  const remaining  = hidden.length
+
+  const handleToggle = () => {
+    if (expanded) {
+      // Zwiń i wróć do sekcji
+      setExpanded(false)
+      setTimeout(() => {
+        document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+    } else {
+      setExpanded(true)
+    }
+  }
 
   return (
     <section id="projects" style={{ padding: 'var(--section-padding)', position: 'relative', zIndex: 2 }}>
       <div className="container">
+
+        {/* Nagłówek */}
         <div ref={ref}>
           <div className="section-label" style={{
             opacity: inView ? 1 : 0,
@@ -254,55 +259,134 @@ export default function Projects() {
           }}>
             Projekty
           </div>
-          <h2 className="section-title" style={{
-            opacity: inView ? 1 : 0,
-            transform: inView ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'all 0.6s ease 0.2s',
-          }}>
-            Co zbudowałem
-          </h2>
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '56px', flexWrap: 'wrap', gap: '16px' }}>
+            <h2 style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(2rem, 5vw, 3.2rem)',
+              fontWeight: 800, color: 'var(--text)', margin: 0,
+              opacity: inView ? 1 : 0,
+              transform: inView ? 'translateY(0)' : 'translateY(20px)',
+              transition: 'all 0.6s ease 0.2s',
+            }}>
+              Co zbudowałem
+            </h2>
+            <span style={{
+              fontSize: '0.72rem', color: 'var(--text-dim)',
+              fontFamily: 'var(--font-mono)', letterSpacing: '0.08em',
+              opacity: inView ? 1 : 0,
+              transition: 'all 0.6s ease 0.3s',
+            }}>
+              {projects.length} projektów łącznie
+            </span>
+          </div>
         </div>
 
-        {/* Featured — 2 kolumny */}
+        {/* Zawsze widoczne 4 */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(460px, 1fr))',
           gap: '24px',
-          marginBottom: '24px',
+          marginBottom: expanded ? '24px' : '0',
         }}>
-          {featured.map((p, i) => <ProjectCard key={p.name} project={p} index={i} />)}
+          {visible.map((p, i) => (
+            <ProjectCard key={p.name} project={p} index={i} visible={true} />
+          ))}
         </div>
 
-        {/* Pozostałe — 2 kolumny */}
+        {/* Ukryte projekty — płynne rozwinięcie */}
+        <div
+          ref={extraRef}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(460px, 1fr))',
+            gap: '24px',
+            overflow: 'hidden',
+            maxHeight: expanded ? `${hidden.length * 600}px` : '0',
+            opacity: expanded ? 1 : 0,
+            transition: 'max-height 0.7s cubic-bezier(0.4,0,0.2,1), opacity 0.5s ease',
+            marginBottom: expanded ? '0' : '0',
+          }}
+        >
+          {hidden.map((p, i) => (
+            <ProjectCard key={p.name} project={p} index={i} visible={expanded} />
+          ))}
+        </div>
+
+        {/* Separator + przycisk */}
         <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))',
-          gap: '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '20px',
+          marginTop: '48px',
         }}>
-          {rest.map((p, i) => <ProjectCard key={p.name} project={p} index={i + featured.length} />)}
-        </div>
 
-        {/* GitHub CTA */}
-        <div style={{ textAlign: 'center', marginTop: '60px' }}>
+          {/* Linia z gradientem */}
+          {!expanded && (
+            <div style={{
+              width: '100%',
+              height: '60px',
+              background: 'linear-gradient(to bottom, transparent, var(--bg))',
+              marginTop: '-80px',
+              marginBottom: '16px',
+              pointerEvents: 'none',
+            }} />
+          )}
+
+          {/* Przycisk */}
+          <button
+            onClick={handleToggle}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '13px 32px',
+              background: 'transparent',
+              border: '1px solid var(--border)',
+              borderRadius: '8px',
+              color: 'var(--text-muted)',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.8rem',
+              letterSpacing: '0.08em',
+              cursor: 'pointer',
+              transition: 'all 0.25s ease',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = 'var(--purple-3)'
+              e.currentTarget.style.color = 'var(--purple-3)'
+              e.currentTarget.style.boxShadow = '0 0 20px rgba(179,157,252,0.1)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = 'var(--border)'
+              e.currentTarget.style.color = 'var(--text-muted)'
+              e.currentTarget.style.boxShadow = 'none'
+            }}
+          >
+            {expanded ? (
+              <>
+                <span style={{ transition: 'transform 0.3s', display: 'inline-block' }}>↑</span>
+                Zwiń projekty
+              </>
+            ) : (
+              <>
+                <span style={{ transition: 'transform 0.3s', display: 'inline-block' }}>↓</span>
+                Pokaż pozostałe {remaining} projekty
+              </>
+            )}
+          </button>
+
+          {/* GitHub CTA */}
           <a
             href="https://github.com/szymon-222"
             target="_blank"
             rel="noreferrer"
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontSize: '0.78rem',
-              letterSpacing: '0.08em',
-              color: 'var(--text-muted)',
-              border: '1px solid var(--border)',
-              padding: '13px 28px',
-              borderRadius: '8px',
-              fontFamily: 'var(--font-mono)',
-              transition: 'all 0.25s',
+              fontSize: '0.72rem', letterSpacing: '0.06em',
+              color: 'var(--text-dim)', fontFamily: 'var(--font-mono)',
+              transition: 'color 0.2s',
             }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--purple-3)'; e.currentTarget.style.color = 'var(--purple-3)' }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)';   e.currentTarget.style.color = 'var(--text-muted)' }}
+            onMouseEnter={e => e.currentTarget.style.color = 'var(--purple-3)'}
+            onMouseLeave={e => e.currentTarget.style.color = 'var(--text-dim)'}
           >
             Zobacz wszystko na GitHub →
           </a>
